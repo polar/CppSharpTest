@@ -1,0 +1,193 @@
+
+# The platform that we are building on. We only consider two, linux, or windows.
+def build_platform
+  RUBY_PLATFORM =~ /linux/ ? "linux" : "win"
+end
+
+# The build architecture is always x64 for now.
+def build_arch
+  "x64"
+end
+
+# Currently working off of github.com/mono/CppSharp/master at commit 299cb912cca1ea2d4da7ea12f337bcbf3217253f
+def cpp_sharp_home
+  ENV["CPPSHARP_HOME"] || (build_platform == "linux" ? "#{ENV["HOME"]}/src/CppSharp" : "/devel/src/CppSharp")
+end
+
+# This method produces the CppSharp CLI command
+# for bash(linux) or cmd(windows) as we have to run on the build platform.
+def cpp_sharp_cli
+  # TODO: Put our version of the CppSharp tool somewhere public.
+  if build_platform =~ /linux/
+    # On linux CppSharp is made with gmake, and we must use mono.
+    cli = "mono --debug #{cpp_sharp_home}/build/gmake/lib/Release_x64/CppSharp.CLI.exe"
+  else
+    # On Windows CppSharp is built with vs2017 natively.
+    cli = "#{cpp_sharp_home}/build/vs2017/lib/Release_x64/CppSharp.CLI.exe"
+  end
+  cli
+end
+
+
+def writeFile(file, content)
+  fd = File.open(file, "w+")
+  fd.write(content)
+  fd.close
+end
+
+def generate(output_dir, platform, arch, files)
+  dest = "#{output_dir}/#{platform}/#{arch}"
+  sh gencmd(output_dir, platform, arch, files)
+end
+
+def fixBasicString(platform, file)
+  puts "Fixing std.basic_string.data"
+  content = File.read(file)
+  if platform == "linux"
+    content.sub!("_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv",
+                 "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
+  else
+    content.sub!("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
+                 "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
+  end
+  writeFile(file, content)
+  true
+end
+
+task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  fixed = fixBasicString(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  if fixed 
+      puts "File std.basic_string.data: done."
+  else
+      puts "No std.basic_string.data fix needed."
+  end
+end
+
+task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  puts "Fixing std._String_val"
+  fixed = fixStringVal(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  if fixed 
+      puts "File String_val: done."
+  else
+      puts "No String_val fix needed: Linux"
+  end
+end
+
+def fixStringVal(platform, file)
+  if platform == "win"
+      content = File.read(file)
+      content.sub!(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs.in"))
+      writeFile(file, content)
+      true
+  end
+end
+
+def getTestClass(file)
+  content = File.read(file)
+  content.match(/public unsafe partial class Test(\s*[^}])*}/).to_s
+end
+
+def replaceTestClass(file, new_content)
+  content = File.read(file)
+  content.sub!(/public unsafe partial class Test(\s*[^}])*}/, new_content)
+  writeFile(file, content);
+end
+
+def fixTestClass(platform, file)
+  if platform == "win"
+      content = getTestClass(file)
+      content = content.sub("FieldOffset(32)", "FieldOffset(40)")
+                       .sub("FieldOffset(64)", "FieldOffset(80)")
+                       .sub("FieldOffset(96)", "FieldOffset(120)")
+      replaceTestClass(file, content)
+      true
+  end
+end
+
+# only for windows
+task :fix_test_class => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+  puts "Fixing Test class Field Offsets"
+  fixed = fixTestClass(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK.cs")
+  if fixed 
+      puts "File Test Class FieldOffsets: done."
+  else
+      puts "No String_val fix needed."
+  end
+end
+
+task :fix => [:fix_basic_string, :fix_string_val, :fix_test_class]
+
+def gencmd(output_dir, platform, arch, files)
+    vector_holder_path = File.expand_path("CppAPI/Interop/VectorHolder.hpp")
+    optional_path = File.expand_path("CppAPI/Interop/Optional.hpp")
+    
+    options = "-DGENERATE"
+    cflags = " -std=c++11 "
+    #
+    # We are just going with options at this point. CFlags don't mean much here.
+    #
+    dest = "#{output_dir}/#{platform}/#{arch}/ALK"
+    cmd = "#{cpp_sharp_cli} "
+    if platform == "linux"
+      cmd << "--c++11 "
+    end
+    cmd << "--p=#{platform} --a=#{arch} "
+    cmd << "--on=ALK "                                             # Output namespace
+    cmd << "--o=#{dest} "                                          # output directory for generated files
+    cmd << options << " "                                          # Compiler Options from above.
+    cmd << files.join(" ")                                         # Include files
+    cmd
+end
+
+directory("Generated")
+
+file "Generated/#{build_platform}/#{build_arch}/ALK.cs" => FileList["Generated", "Includes.hpp", "CppAPI/**/*.hpp"] do
+    generate("Generated", build_platform, build_arch, ["Includes.hpp"])
+end
+
+desc "Generates the ALK.Interop.cs file and the symbols"
+task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK.cs"]
+
+task :gen => [:generate, :fix_basic_string, :fix_string_val, :fix_vector_val, :fix_test_class]
+
+task :clean do
+  rm_rf "cmake-#{build_platform}-build"
+  rm_rf "Generated"
+end
+
+task :regen => [:clean, :gen]
+
+directory("cmake-#{build_platform}-build")
+
+file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/#{build_arch}/ALK.cs"] do
+  Dir.chdir("cmake-linux-build") do
+    sh "cmake .."
+  end
+end
+
+file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK.cs"] do
+  Dir.chdir("cmake-win-build") do
+    # If it's not already built we build Debug.
+    sh "cmake -GNinja .."
+  end
+end
+
+file "bin/Debug/netcoreapp3.1/ALK.dll" => FileList["cmake-win-build/CMakeCache.txt", "CppAPI/**/*.?pp"] do
+  Dir.chdir("cmake-win-build") do
+    sh "ninja install"
+  end
+end
+
+file "bin/Debug/netcoreapp3.1/libALK.so" => FileList["cmake-linux-build/CMakeCache.txt", "CppAPI/**/*.?pp"] do
+  Dir.chdir("cmake-linux-build") do
+    sh "make install"
+  end
+end
+
+library = build_platform == "linux" ? "bin/Debug/netcoreapp3.1/libALK.so" : "bin/Debug/netcoreapp3.1/ALK.dll"
+
+task :compile => [library]
+
+task :run => [:compile] do
+  sh "dotnet run"
+end
