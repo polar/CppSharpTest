@@ -79,12 +79,9 @@ def getStringVal(file)
 end
 
 def replaceStringVal(file, new_content)
-  if platform == "win"
     content = File.read(file)
     content.sub!(/namespace StringVal[\s][^}]*}[\s][^}]*}[\s][^}]*}\s*}/, new_content)
     writeFile(file, content)
-    true
-  end
 end
 
 def fixStringVal(platform, file)
