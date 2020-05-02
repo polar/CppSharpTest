@@ -148,7 +148,7 @@ end
 desc "Generates the ALK.Interop.cs file and the symbols"
 task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
 
-task :gen => [:generate, :fix_basic_string, :fix_string_val, :fix_vector_val, :fix_test_class]
+task :gen => [:generate, :fix_basic_string, :fix_string_val, :fix_test_class]
 
 task :clean do
   rm_rf "cmake-#{build_platform}-build"
