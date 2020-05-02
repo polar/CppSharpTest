@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup Condition="Exists('/etc/passwd')">
-        <Compile Remove="Generated\win" />
+        <Compile Remove="Generated\win\**\*.cs" />
     </ItemGroup>
     
     <ItemGroup Condition="!Exists('/etc/passwd')">
-        <Compile Remove="Generated\linux" />
+        <Compile Remove="Generated\linux\**\*.cs" />
     </ItemGroup>
     
     <ItemGroup>

@@ -54,8 +54,8 @@ def fixBasicString(platform, file)
   true
 end
 
-task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
-  fixed = fixBasicString(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do 
+  fixed = fixBasicString(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK/Std.cs")
   if fixed 
       puts "File std.basic_string.data: done."
   else
@@ -63,9 +63,9 @@ task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] d
   end
 end
 
-task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do 
   puts "Fixing std._String_val"
-  fixed = fixStringVal(build_platform, "Generated/#{build_platform}/#{build_arch}/Std.cs")
+  fixed = fixStringVal(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK/Std.cs")
   if fixed 
       puts "File String_val: done."
   else
@@ -105,9 +105,9 @@ def fixTestClass(platform, file)
 end
 
 # only for windows
-task :fix_test_class => ["Generated/#{build_platform}/#{build_arch}/ALK.cs"] do 
+task :fix_test_class => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do 
   puts "Fixing Test class Field Offsets"
-  fixed = fixTestClass(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK.cs")
+  fixed = fixTestClass(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs")
   if fixed 
       puts "File Test Class FieldOffsets: done."
   else
@@ -146,7 +146,7 @@ file "Generated/#{build_platform}/#{build_arch}/ALK.cs" => FileList["Generated",
 end
 
 desc "Generates the ALK.Interop.cs file and the symbols"
-task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK.cs"]
+task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
 
 task :gen => [:generate, :fix_basic_string, :fix_string_val, :fix_vector_val, :fix_test_class]
 
@@ -159,13 +159,13 @@ task :regen => [:clean, :gen]
 
 directory("cmake-#{build_platform}-build")
 
-file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/#{build_arch}/ALK.cs"] do
+file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/#{build_arch}/ALK/ALK.cs"] do
   Dir.chdir("cmake-linux-build") do
     sh "cmake .."
   end
 end
 
-file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK.cs"] do
+file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK/ALK.cs"] do
   Dir.chdir("cmake-win-build") do
     # If it's not already built we build Debug.
     sh "cmake -GNinja .."
