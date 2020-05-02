@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Text;
 using ALK;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace ALK
 {
@@ -28,7 +29,7 @@ namespace PolarCppSharpTest
 {
     class Program
     {
-        static unsafe void Main(string[] args)
+        static unsafe int Main(string[] args)
         {
             Test test = Test.StaticTest;
             Console.WriteLine("************** C++ *************");
@@ -57,6 +58,8 @@ namespace PolarCppSharpTest
                 Console.WriteLine(e);
                 test.Print();
             }
+
+            return 0;
         }
     }
 }
