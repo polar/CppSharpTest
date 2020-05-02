@@ -40,29 +40,6 @@ def generate(output_dir, platform, arch, files)
   sh gencmd(output_dir, platform, arch, files)
 end
 
-def fixBasicString(platform, file)
-  puts "Fixing std.basic_string.data"
-  content = File.read(file)
-  if platform == "linux"
-    content.sub!("_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv",
-                 "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv")
-  else
-    content.sub!("?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEAAPEADXZ",
-                 "?data@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QEBAPEBDXZ")
-  end
-  writeFile(file, content)
-  true
-end
-
-task :fix_basic_string => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do 
-  fixed = fixBasicString(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK/Std.cs")
-  if fixed 
-      puts "File std.basic_string.data: done."
-  else
-      puts "No std.basic_string.data fix needed."
-  end
-end
-
 task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do 
   puts "Fixing std._String_val"
   fixed = fixStringVal(build_platform, "Generated/#{build_platform}/#{build_arch}/ALK/Std.cs")
@@ -73,6 +50,12 @@ task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
   end
 end
 
+##
+## Change the Std.StringVal FieldOffsets
+##   [FieldOffset(0)]  ==> [FieldOffset(8)]
+##   [FieldOffset(16)] ==> [FieldOffset(24)]
+##   [FieldOffset(24)] ==> [FieldOffset(0)]
+##
 def getStringVal(file)
     content = File.read(file)
     content.match(/namespace StringVal[\s][^}]*}[\s][^}]*}[\s][^}]*}\s*}/).to_s
@@ -96,6 +79,13 @@ def fixStringVal(platform, file)
   end
 end
 
+##
+## Change the Test Class FieldOffsets
+##   [FieldOffset(0)]  ==> [FieldOffset(0)]
+##   [FieldOffset(32)] ==> [FieldOffset(40)]
+##   [FieldOffset(64)] ==> [FieldOffset(80)]
+##   [FieldOffset(96)] ==> [FieldOffset(120)]
+##
 def getTestClass(file)
   content = File.read(file)
   content.match(/public unsafe partial class Test(\s*[^}])*}/).to_s
@@ -129,7 +119,7 @@ task :fix_test_class => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
   end
 end
 
-task :fix => [:fix_basic_string, :fix_string_val, :fix_test_class]
+task :fix => [:fix_test_class, :fix_string_val]
 
 def gencmd(output_dir, platform, arch, files)
     vector_holder_path = File.expand_path("CppAPI/Interop/VectorHolder.hpp")
