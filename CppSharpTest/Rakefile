@@ -76,7 +76,7 @@ end
 def fixStringVal(platform, file)
   if platform == "win"
       content = File.read(file)
-      content.sub!(/namespace _Vector_val[\s][^}]*}\s*}/, File.read("Template/Vector_val.cs.in"))
+      content.sub!(/namespace _String_val[\s][^}]*}[\s][^}]*}\s*}/, File.read("Template/String_val.cs.in"))
       writeFile(file, content)
       true
   end
