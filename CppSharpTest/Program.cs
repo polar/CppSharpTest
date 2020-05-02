@@ -36,24 +36,37 @@ namespace PolarCppSharpTest
             test.Print();
             try
             {
+                bool pass = true;
                 Console.WriteLine("************** C# *************");
                 Console.WriteLine("******* Properties *******");
                 Console.WriteLine("Test Addr = " + test.Addr);
+                pass &= test.Item1 == "item1";
                 Console.WriteLine("Test.Item1: " + test.AItem1 + " % " + test.OItem1 + " '" + test.Item1 + "'");
+                pass &= test.Item2 == "item2";
                 Console.WriteLine("Test.Item2: " + test.AItem2 + " % " + test.OItem2 + " '" + test.Item2 + "'");
+                pass &= test.Item3 == "item3";
                 Console.WriteLine("Test.Item3: " + test.AItem3 + " % " + test.OItem3 + " '" + test.Item3 + "'");
+                pass &= test.Item4 == "item4";
                 Console.WriteLine("Test.Item4: " + test.AItem4 + " % " + test.OItem4 + " '" + test.Item4 + "'");
                 Console.WriteLine("******* Function Calls *******");
+                pass &= test.ReturnString(1) == "item1";
                 Console.WriteLine("Test.returnString(1): " + test.ReturnString(1));
+                pass &= test.ReturnString(2) == "item2";
                 Console.WriteLine("Test.returnString(2): " + test.ReturnString(2));
+                pass &= test.ReturnString(3) == "item3";
                 Console.WriteLine("Test.returnString(3): " + test.ReturnString(3));
+                pass &= test.ReturnString(4) == "item4";
                 Console.WriteLine("Test.returnString(4): " + test.ReturnString(4));
                 Console.WriteLine("******* Function Calls using StringVal *******");
+                pass &= test.ReturnStringXXX(1) == "item1";
                 Console.WriteLine("Test.returnStringXXX(1): " + test.ReturnStringXXX(1));
+                pass &= test.ReturnStringXXX(2) == "item2";
                 Console.WriteLine("Test.returnStringXXX(2): " + test.ReturnStringXXX(2));
+                pass &= test.ReturnStringXXX(3) == "item3";
                 Console.WriteLine("Test.returnStringXXX(3): " + test.ReturnStringXXX(3));
+                pass &= test.ReturnStringXXX(4) == "item4";
                 Console.WriteLine("Test.returnStringXXX(4): " + test.ReturnStringXXX(4));
-                Console.WriteLine("******* END TEST *******");
+                Console.WriteLine(@"******* END TEST ((({0}))) *******",  pass ? "PASSED" : "FAILED" );
                 Console.WriteLine("Test passes if 'item?' is returned from every item/returnString print");
                 test.Print();
             }
