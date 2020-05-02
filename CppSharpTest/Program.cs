@@ -10,11 +10,13 @@ namespace ALK
     {
         public unsafe string ReturnStringXXX(int x)
         {
+#if LINUX
             var __ret = new global::Std.BasicString.__Internalc__N_std_N___cxx11_S_basic_string__C___N_std_S_char_traits__C___N_std_S_allocator__C();
             __Internal.ReturnString(new IntPtr(&__ret), __Instance, x);
-#if LINUX
             return (((int) __ret._M_string_length) > 15 ? global::System.Text.Encoding.UTF8.GetString((byte*)__ret._M_dataplus._M_p, (int) __ret._M_string_length) : global::System.Text.Encoding.UTF8.GetString((byte*)__ret._M_local_buf, (int) __ret._M_string_length));
 #else
+            var __ret = new global::Std.BasicString.__Internalc__N_std_S_basic_string__C___N_std_S_char_traits__C___N_std_S_allocator__C();
+            __Internal.ReturnString(__Instance, new IntPtr(&__ret), x);
             return (((int) __ret._Mypair._Myval2._Mysize) > 15 ? global::System.Text.Encoding.UTF8.GetString((byte*) __ret._Mypair._Myval2._Bx._Ptr, (int) __ret._Mypair._Myval2._Mysize) : global::System.Text.Encoding.UTF8.GetString((byte*) __ret._Mypair._Myval2._Bx._Buf, (int) __ret._Mypair._Myval2._Mysize));
 #endif
 
