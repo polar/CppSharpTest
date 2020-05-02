@@ -132,7 +132,7 @@ def gencmd(output_dir, platform, arch, files)
     #
     dest = "#{output_dir}/#{platform}/#{arch}/ALK"
     cmd = "#{cpp_sharp_cli} "
-    if platform == "linux"
+    if true || platform == "linux"
       cmd << "--c++11 "
     end
     cmd << "--p=#{platform} --a=#{arch} "
