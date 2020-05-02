@@ -75,7 +75,7 @@ end
 
 def getStringVal(file)
     content = File.read(file)
-    content.match(/namespace StringVal[\s][^}]*}[\s][^}]*}[\s][^}]*}\s*}/)
+    content.match(/namespace StringVal[\s][^}]*}[\s][^}]*}[\s][^}]*}\s*}/).to_s
 end
 
 def replaceStringVal(file, new_content)
