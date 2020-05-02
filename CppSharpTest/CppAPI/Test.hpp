@@ -32,4 +32,6 @@
 
     static Test getTest();
     static Test &getStaticTest();
+    
+    std::string returnString(int x);
   };

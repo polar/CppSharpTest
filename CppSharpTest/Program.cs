@@ -23,6 +23,14 @@ namespace PolarCppSharpTest
             test.Print();
             Console.WriteLine("Test.Item4: " + test.AItem4 + " % " + test.OItem4 + " '" + test.Item4 + "'");
             test.Print();
+            Console.WriteLine("Test.returnString(1): " + test.ReturnString(1));
+            test.Print();
+            Console.WriteLine("Test.returnString(1): " + test.ReturnString(2));
+            test.Print();
+            Console.WriteLine("Test.returnString(1): " + test.ReturnString(3));
+            test.Print();
+            Console.WriteLine("Test.returnString(1): " + test.ReturnString(4));
+            test.Print();
         }
     }
 }

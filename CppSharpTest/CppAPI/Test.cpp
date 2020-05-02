@@ -74,3 +74,15 @@
     std::cout << "Test::CopyConstructor on " << (void *) t.addr() << " : " << t.addr()
               << " ==> " << (void *) addr() << " : " << addr() << std::endl;
   }
+  
+  std::string Test::returnString(int x)
+  {
+    switch(x)
+    {
+        case 1: return item1;
+        case 2: return item2;
+        case 3: return item3;
+        case 4: return item4;
+        default: "wrong";
+    }
+  }

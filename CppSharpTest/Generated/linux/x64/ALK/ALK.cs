@@ -49,6 +49,11 @@ namespace ALK
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport("ALK", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
+                EntryPoint="_ZN4Test12returnStringB5cxx11Ei")]
+            internal static extern void ReturnString(global::System.IntPtr @return, global::System.IntPtr __instance, int x);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport("ALK", CallingConvention = global::System.Runtime.InteropServices.CallingConvention.Cdecl,
                 EntryPoint="_ZNK4Test4addrEv")]
             internal static extern ulong Addr(global::System.IntPtr __instance);
 
@@ -181,6 +186,16 @@ namespace ALK
         public void Print()
         {
             __Internal.Print(__Instance);
+        }
+
+        public string ReturnString(int x)
+        {
+            var __ret = new global::Std.BasicString.__Internalc__N_std_N___cxx11_S_basic_string__C___N_std_S_char_traits__C___N_std_S_allocator__C();
+            __Internal.ReturnString(new IntPtr(&__ret), __Instance, x);
+            var __basicStringRet0 = global::Std.BasicString<sbyte, global::Std.CharTraits<sbyte>, global::Std.Allocator<sbyte>>.__CreateInstance(new global::System.IntPtr(&__ret));
+            var __retString0 = global::Std.BasicStringExtensions.Data(__basicStringRet0);
+            __basicStringRet0.Dispose();
+            return __retString0;
         }
 
         public string Item1
