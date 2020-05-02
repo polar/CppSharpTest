@@ -74,10 +74,8 @@ task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
 end
 
 def getStringVal(file)
-  if platform = "win"
     content = File.read(file)
     content.match(/namespace StringVal[\s][^}]*}[\s][^}]*}[\s][^}]*}\s*}/)
-  end
 end
 
 def replaceStringVal(file, new_content)
