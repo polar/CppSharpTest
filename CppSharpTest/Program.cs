@@ -37,28 +37,34 @@ namespace PolarCppSharpTest
             try
             {
                 Console.WriteLine("************** C# *************");
+                Console.WriteLine("******* Properties *******");
                 Console.WriteLine("Test Addr = " + test.Addr);
                 Console.WriteLine("Test.Item1: " + test.AItem1 + " % " + test.OItem1 + " '" + test.Item1 + "'");
                 Console.WriteLine("Test.Item2: " + test.AItem2 + " % " + test.OItem2 + " '" + test.Item2 + "'");
                 Console.WriteLine("Test.Item3: " + test.AItem3 + " % " + test.OItem3 + " '" + test.Item3 + "'");
                 Console.WriteLine("Test.Item4: " + test.AItem4 + " % " + test.OItem4 + " '" + test.Item4 + "'");
+                Console.WriteLine("******* Function Calls *******");
                 Console.WriteLine("Test.returnString(1): " + test.ReturnString(1));
                 Console.WriteLine("Test.returnString(2): " + test.ReturnString(2));
                 Console.WriteLine("Test.returnString(3): " + test.ReturnString(3));
                 Console.WriteLine("Test.returnString(4): " + test.ReturnString(4));
+                Console.WriteLine("******* Function Calls using StringVal *******");
                 Console.WriteLine("Test.returnStringXXX(1): " + test.ReturnStringXXX(1));
                 Console.WriteLine("Test.returnStringXXX(2): " + test.ReturnStringXXX(2));
                 Console.WriteLine("Test.returnStringXXX(3): " + test.ReturnStringXXX(3));
                 Console.WriteLine("Test.returnStringXXX(4): " + test.ReturnStringXXX(4));
-                Console.WriteLine("Test passes if 'item?' is returned from every print");
+                Console.WriteLine("******* END TEST *******");
+                Console.WriteLine("Test passes if 'item?' is returned from every item/returnString print");
                 test.Print();
             }
             catch (Exception e)
             {
+                Console.WriteLine("******* ERROR *******");
                 Console.WriteLine(e);
                 test.Print();
             }
 
+            Console.WriteLine("******* DONE *******");
             return 0;
         }
     }
