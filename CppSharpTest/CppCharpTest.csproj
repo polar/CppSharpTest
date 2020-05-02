@@ -11,6 +11,14 @@
     <PropertyGroup Condition="Exists('/etc/passwd')">
         <DefineConstants>LINUX</DefineConstants>
     </PropertyGroup>
+
+    <ItemGroup Condition="Exists('/etc/passwd')">
+        <Compile Remove="Generated\win" />
+    </ItemGroup>
+    
+    <ItemGroup Condition="!Exists('/etc/passwd')">
+        <Compile Remove="Generated\linux" />
+    </ItemGroup>
     
     <ItemGroup>
       <None Remove="CppAPI\Interop" />
