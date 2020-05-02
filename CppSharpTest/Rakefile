@@ -73,11 +73,30 @@ task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
   end
 end
 
+def getStringVal(file)
+  if platform = "win"
+    content = File.read(file)
+    content.match(/namespace StringVal[\s][^}]*}[\s][^}]*}\s*}/)
+  end
+end
+
+def replaceStringVal(file, new_content)
+  if platform == "win"
+    content = File.read(file)
+    content.sub!(/namespace StringVal[\s][^}]*}[\s][^}]*}\s*}/, new_content)
+    writeFile(file, content)
+    true
+  end
+end
+
 def fixStringVal(platform, file)
   if platform == "win"
-      content = File.read(file)
-      content.sub!(/namespace _String_val[\s][^}]*}[\s][^}]*}\s*}/, File.read("Template/String_val.cs.in"))
-      writeFile(file, content)
+      content = getTestClass(file)
+      # order is important
+      content = content.sub("FieldOffset(0)", "FieldOffset(8)")
+                       .sub("FieldOffset(24)", "FieldOffset(0)")
+                       .sub("FieldOffset(16)", "FieldOffset(24)")
+      replaceTestClass(file, content)
       true
   end
 end
