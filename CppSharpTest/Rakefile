@@ -135,6 +135,7 @@ def gencmd(output_dir, platform, arch, files)
     if true || platform == "linux"
       cmd << "--c++11 "
     end
+    cmd << "--A=\"#{cflags}\""
     cmd << "--p=#{platform} --a=#{arch} "
     cmd << "--on=ALK "                                             # Output namespace
     cmd << "--o=#{dest} "                                          # output directory for generated files
