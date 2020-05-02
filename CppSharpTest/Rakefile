@@ -86,7 +86,7 @@ end
 
 def fixStringVal(platform, file)
   if platform == "win"
-      content = getTestClass(file)
+      content = getStringVal(file)
       # order is important
       content = content.sub("FieldOffset(0)", "FieldOffset(8)")
                        .sub("FieldOffset(24)", "FieldOffset(0)")
