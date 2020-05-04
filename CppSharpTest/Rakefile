@@ -178,7 +178,7 @@ end
 
 directory("Generated")
 
-file "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs" => [:cpp_sharp_check] + FileList["Generated", "Includes.hpp", "CppAPI/**/*.hpp"] do
+file "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs" => FileList["Generated", "Includes.hpp", "CppAPI/**/*.hpp"] do
     generate("Generated", build_platform, build_arch, ["Includes.hpp"])
 end
 
