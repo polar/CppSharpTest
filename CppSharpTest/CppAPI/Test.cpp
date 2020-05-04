@@ -84,6 +84,6 @@
         case 2: return item2;
         case 3: return item3;
         case 4: return item4;
-        default: "wrong";
+        default: return "wrong";
     }
   }
