@@ -259,8 +259,8 @@ task :windows_config_debug => [:regen, "cmake-win-build"] do
   Rake::Task["windows_cmake_config"].invoke
 end
 
-desc "Creates the CMake build configured for Debug"
-task :windows_config_debug do
+desc "Creates the CMake build configured for Release"
+task :windows_config_release do
   writeFile("configuration.txt", "Release")
   Rake::Task["gen"].invoke
   Rake::Task["windows_cmake_config"].invoke
