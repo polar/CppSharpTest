@@ -9,6 +9,19 @@ def build_arch
   "x64"
 end
 
+
+def configuration
+  if File.exists?("#{File.dirname(__FILE__)}/configuration.txt")
+    if File.read("#{File.dirname(__FILE__)}/configuration.txt") =~ /Release/
+      "Release"
+    else
+      "Debug"
+    end
+  else
+    "Debug"
+  end
+end
+
 # Currently working off of github.com/mono/CppSharp/master at commit 0da9c46a7365be7d8b35a60ca4f822b6cbba6a49
 def cpp_sharp_home
   ENV["CPPSHARP_HOME"] || (build_platform == "linux" ? "#{ENV["HOME"]}/src/CppSharp" : "/devel/src/CppSharp")
@@ -67,9 +80,9 @@ def writeFile(file, content)
   fd.close
 end
 
-def generate(output_dir, platform, arch, files)
+def generate(output_dir, platform, arch, config, files)
   dest = "#{output_dir}/#{platform}/#{arch}"
-  sh gencmd(output_dir, platform, arch, files)
+  sh gencmd(output_dir, platform, arch, config, files)
 end
 
 task :fix_string_val => ["Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"] do
@@ -153,11 +166,14 @@ end
 
 task :fix => [:fix_test_class, :fix_string_val]
 
-def gencmd(output_dir, platform, arch, files)
+def gencmd(output_dir, platform, arch, debug_release, files)
     vector_holder_path = File.expand_path("CppAPI/Interop/VectorHolder.hpp")
     optional_path = File.expand_path("CppAPI/Interop/Optional.hpp")
 
-    options = "-DGENERATE"
+    options = "-DGENERATE "
+    if (debug_release == "Debug")
+      options = "-D_DEBUG"
+    end
     cflags = " -std=c++11 "
     #
     # We are just going with options at this point. CFlags don't mean much here.
@@ -179,14 +195,14 @@ end
 directory("Generated")
 
 file "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs" => FileList["Generated", "Includes.hpp", "CppAPI/**/*.hpp"] do
-    generate("Generated", build_platform, build_arch, ["Includes.hpp"])
+    generate("Generated", build_platform, build_arch, configuration, ["Includes.hpp"])
 end
 
 desc "Generates the ALK.Interop.cs file and the symbols"
 task :generate => ["Generated", "Generated/#{build_platform}/#{build_arch}/ALK/ALK.cs"]
 
 task :gen => [:cpp_sharp_check, "Generated"] do
-   generate("Generated", build_platform, build_arch, ["Includes.hpp"])
+   generate("Generated", build_platform, build_arch, configuration,["Includes.hpp"])
 end
 
 task :clean do
@@ -220,6 +236,55 @@ end
 file "bin/Debug/netcoreapp3.1/libALK.so" => FileList["cmake-linux-build/CMakeCache.txt", "CppAPI/**/*.?pp"] do
   Dir.chdir("cmake-linux-build") do
     sh "make install"
+  end
+end
+
+desc "Creates the CMake build"
+task :linux_cmake_config => ["cmake-linux-build/CMakeCache.txt"]
+
+desc "Creates the CMake build"
+task :windows_cmake_config => ["cmake-win-build/CMakeCache.txt"]
+
+desc "Creates the CMake build configured for Debug"
+task :linux_config_debug => [:regen, "cmake-linux-build"] do
+  writeFile("configuration.txt", "Debug")
+  Rake::Task["gen"].invoke
+  Rake::Task["linux_cmake_config"].invoke
+end
+
+desc "Creates the CMake build configured for Debug"
+task :windows_config_debug => [:regen, "cmake-win-build"] do
+  writeFile("configuration.txt", "Debug")
+  Rake::Task["gen"].invoke
+  Rake::Task["windows_cmake_config"].invoke
+end
+
+desc "Creates the CMake build configured for Debug"
+task :windows_config_debug do
+  writeFile("configuration.txt", "Release")
+  Rake::Task["gen"].invoke
+  Rake::Task["windows_cmake_config"].invoke
+end
+
+desc "Creates the CMake build configured for Release"
+task :linux_config_release do
+  writeFile("configuration.txt", "Release")
+  Rake::Task["gen"].invoke
+  Rake::Task["linux_cmake_config"].invoke
+end
+
+task :config_debug do
+  if build_platform == "linux"
+    Rake::Task["linux_config_debug"].invoke
+  else
+    Rake::Task["windows_config_debug"].invoke
+  end
+end
+task :config_release do
+  if build_platform == "linux"
+    Rake::Task["linux_config_release"].invoke
+  else
+    Rake::Task["windows_config_release"].invoke
   end
 end
 
