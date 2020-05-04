@@ -216,14 +216,14 @@ directory("cmake-#{build_platform}-build")
 
 file "cmake-linux-build/CMakeCache.txt" => ["cmake-linux-build", "CMakeLists.txt", "Generated/linux/#{build_arch}/ALK/ALK.cs"] do
   Dir.chdir("cmake-linux-build") do
-    sh "cmake .."
+    sh "cmake -DCMAKE_BUILD_TYPE=#{configuration} .."
   end
 end
 
 file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK/ALK.cs"] do
   Dir.chdir("cmake-win-build") do
     # If it's not already built we build Debug.
-    sh "cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .."
+    sh "cmake -GNinja -DCMAKE_BUILD_TYPE=#{configuration} .."
   end
 end
 
