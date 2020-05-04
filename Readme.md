@@ -8,6 +8,50 @@ the current state at
     
 This problem only relates to Windows code generation. 
 
+# UPDATE  4 May, 2020 #
+
+This memory alignment problem stems from the Debug/Release modes on Windows. The Release/Debug
+mode on Linux has no problems. 
+
+Apparently, you cannot mix
+Debug libraries and Release libraries in Windoze because the standard library structures
+are different, something that Linux does not do. This disparity means that you must have
+Debug compiled libraries or Release compiled libraries, and you better not mix them
+especially if you are passing things like std::string across library boundaries,
+and in this case, the P/INVOKE interface between CppSharp generated code and C#. WTF?
+
+This whole problem was solved by making sure that if you were compiling 
+your C++ in Debug mode on Windoze with MVSC++ that you issue the 
+
+    -D_DEBUG
+    
+flag to the CppSharp CLI command line. Do not issue this flag in the extra cflags, i.e. the `--A` CppSharp
+option. Note the underbar(_) before DEBUG.  For example, the following would be a
+suitable CLI command line for generating Debug oriented code:
+
+    CppSharp.CLI.exe -D_DEBUG Test.hpp
+    
+The issue for CppSharp was https://github.com/mono/CppSharp/issues/1365, and it has
+now been CLOSED.
+
+The problems with the size of std::string and even the alignment problems with the
+lower problem have been resolved with the issue of using `-D_DEBUG` flag as well.
+Of course, remember to compile your C++ code with the same flag, or not.
+
+**NOTE::** This repository will remain as show and example of using Rake to 
+use CppSharp with Linux and Windows configurations and configure them for 
+Release vs Debug.
+
+There are now new rake tasks called:
+
+    rake config_debug
+    rake config_release
+
+both tasks, clean the generated directories and write a file called `configuration.txt`
+containing either `Debug` or `Release`. This file is used in deciding to include
+the `-D_DEBUG` flag in the call to CppSharp and to generate the proper 
+`-DCMAKE_BUILD_TYPE=Release|Debug` option to CMake.
+
 ## The Problem ##
 
 The std::string type in Windows is given a size of 32. So, therefore,
