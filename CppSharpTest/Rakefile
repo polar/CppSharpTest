@@ -158,7 +158,7 @@ def gencmd(output_dir, platform, arch, files)
     optional_path = File.expand_path("CppAPI/Interop/Optional.hpp")
 
     options = "-DGENERATE"
-    cflags = " -std=c++11 -D_DEBUG"
+    cflags = " -std=c++11 -DDEBUG -D_DEBUG"
     #
     # We are just going with options at this point. CFlags don't mean much here.
     #
