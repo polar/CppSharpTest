@@ -16,27 +16,34 @@ mode on Linux has no problems.
 Apparently, you cannot mix
 Debug libraries and Release libraries in Windoze because the standard library structures
 are different, something that Linux does not do. This disparity means that you must have
-Debug compiled libraries or Release compiled libraries, and you better not mix them
-especially if you are passing things like std::string across library boundaries,
-and in this case, the P/INVOKE interface between CppSharp generated code and C#. WTF?
+either Debug compiled libraries or Release compiled libraries. You better not mix them
+especially if you are passing things like std::string across library boundaries. More relevant
+to this case, you cannot mix them in crossing the P/INVOKE interface between 
+CppSharp generated C# code and its C++ counterpart.
 
 This whole problem was solved by making sure that if you were compiling 
 your C++ in Debug mode on Windoze with MVSC++ that you issue the 
 
     -D_DEBUG
     
-flag to the CppSharp CLI command line. Do not issue this flag in the extra cflags, i.e. the `--A` CppSharp
-option. Note the underbar(_) before DEBUG.  For example, the following would be a
-suitable CLI command line for generating Debug oriented code:
+flag to the CppSharp CLI command line. Do not issue this flag in the extra cflags, i.e. 
+inside the `--A=` CppSharp
+option. Note, there is an underbar(_) before DEBUG.  For example, the following would be a
+suitable CLI command line for generating Debug oriented code on Windows:
 
     CppSharp.CLI.exe -D_DEBUG Test.hpp
-    
-The issue for CppSharp was https://github.com/mono/CppSharp/issues/1365, and it has
-now been CLOSED.
+
+Note, that this flag may be issued for Linux as well without consequence. The standard libraries 
+on Linux are unaffected by this flag in this regard, and the result will not be different. 
+
+The issue for CppSharp problem is https://github.com/mono/CppSharp/issues/1365, and it has
+now been CLOSED, on 4-May-2020.
 
 The problems with the size of std::string and even the alignment problems with the
-lower problem have been resolved with the issue of using `-D_DEBUG` flag as well.
-Of course, remember to compile your C++ code with the same flag, or not.
+lower problem of wrong offsets for the StringVal internals have also been resolved with 
+issuing the `-D_DEBUG` flag. 
+
+Remember to compile your C++ code with the same flag, or not, but be consistent between the two.
 
 **NOTE::** This repository will remain as show and example of using Rake to 
 use CppSharp with Linux and Windows configurations and configure them for 
@@ -48,7 +55,8 @@ There are now new rake tasks called:
     rake config_release
 
 both tasks, clean the generated directories and write a file called `configuration.txt`
-containing either `Debug` or `Release`. This file is used in deciding to include
+containing either `Debug` or `Release`, regenerate the C# and recreate the CMake 
+build directory. The `configuration.txt` file is used in deciding to include
 the `-D_DEBUG` flag in the call to CppSharp and to generate the proper 
 `-DCMAKE_BUILD_TYPE=Release|Debug` option to CMake.
 
