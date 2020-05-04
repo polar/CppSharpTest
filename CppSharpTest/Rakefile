@@ -207,7 +207,7 @@ end
 file "cmake-win-build/CMakeCache.txt" => ["cmake-win-build", "CMakeLists.txt", "Generated/win/#{build_arch}/ALK/ALK.cs"] do
   Dir.chdir("cmake-win-build") do
     # If it's not already built we build Debug.
-    sh "cmake -GNinja -DCMAKE_BUILD_TYPE=Release .."
+    sh "cmake -GNinja -DCMAKE_BUILD_TYPE=Debug .."
   end
 end
 
