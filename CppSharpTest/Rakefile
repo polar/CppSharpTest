@@ -246,14 +246,14 @@ desc "Creates the CMake build"
 task :windows_cmake_config => ["cmake-win-build/CMakeCache.txt"]
 
 desc "Creates the CMake build configured for Debug"
-task :linux_config_debug => [:regen, "cmake-linux-build"] do
+task :linux_config_debug do
   writeFile("configuration.txt", "Debug")
   Rake::Task["gen"].invoke
   Rake::Task["linux_cmake_config"].invoke
 end
 
 desc "Creates the CMake build configured for Debug"
-task :windows_config_debug => [:regen, "cmake-win-build"] do
+task :windows_config_debug do
   writeFile("configuration.txt", "Debug")
   Rake::Task["gen"].invoke
   Rake::Task["windows_cmake_config"].invoke
