@@ -34,3 +34,6 @@ install(TARGETS Std-symbols
                 bin/Debug/netcoreapp3.1
                 COMPONENT
                 Libraries)
+
+add_executable(main CppAPI/Main.cpp)
+target_link_libraries(main PRIVATE ALK)
